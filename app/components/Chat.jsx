@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 
@@ -26,10 +27,30 @@ const Chat = () => {
   //   ease: "none",
   //   repeat: 0,
   // });
+  useEffect(() => {
+    const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    const lastSession =
+      sessions.length > 0 ? sessions[sessions.length - 1] : null;
+    if (lastSession) {
+      setMessages([...lastSession.messages]);
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("message", message);
+
+    const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
+    let currentSession =
+      sessions.length > 0 ? sessions[sessions.length - 1] : null;
+    if (!currentSession || currentSession.isNew) {
+      currentSession = {
+        id: uuidv4(),
+        timestamp: new Date().toLocaleString(),
+        messages: [],
+        isNew: false,
+      };
+      sessions.push(currentSession);
+    }
     try {
       axios
         .post(
@@ -47,14 +68,13 @@ const Chat = () => {
         )
         .then((response) => {
           console.log(response.data);
-          setResponses(response.data.choices[0].message.content);
-          setMessages([
-            ...messages,
-            {
-              user: message,
-              response: response.data.choices[0].message.content,
-            },
-          ]);
+          currentSession.messages.push({
+            user: message,
+            response: response.data.choices[0].message.content,
+          });
+          localStorage.setItem("chatHistory", JSON.stringify(sessions));
+          setMessages([...currentSession.messages]);
+          setMessage("");
         })
         .catch((error) => console.error(error));
     } catch (err) {
@@ -69,7 +89,7 @@ const Chat = () => {
           {messages.map((msg, index) => (
             <div key={index} className="w-full flex flex-col gap-4">
               <div className="flex justify-end">
-                <div className="flex items-center max-w-1/2  text-white ">
+                <div className="flex items-center max-w-1/2 text-white">
                   <div className="px-4 py-2 bg-blue-400 rounded-xl">
                     {msg.user}
                   </div>
@@ -91,6 +111,35 @@ const Chat = () => {
               </div>
             </div>
           ))}
+
+          {/* {localStorage.getItem("chatHistory") &&
+            JSON.parse(localStorage.getItem("chatHistory")).map(
+              (msg, index) => (
+                <div key={index} className="w-full flex flex-col gap-4">
+                  <div className="flex justify-end">
+                    <div className="flex items-center max-w-1/2  text-white ">
+                      <div className="px-4 py-2 bg-blue-400 rounded-xl">
+                        {msg.user}
+                      </div>
+                      <div className="bg-neutral-700 rounded-full p-4 ml-4">
+                        <FaRegUser />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-start">
+                    <div
+                      className="flex items-center w-max px-4 py-2 text-white rounded-xl"
+                      ref={chatRef}
+                    >
+                      <div className="bg-neutral-700 rounded-full p-4 mr-4">
+                        <SiRobotframework size={20} />
+                      </div>
+                      {msg.response}
+                    </div>
+                  </div>
+                </div>
+              )
+            )} */}
         </div>
       </div>
       <form
@@ -100,8 +149,8 @@ const Chat = () => {
       >
         <input
           type="text"
-          className="flex-1 px-4 py-2 border-2 rounded-xl"
-          placeholder="Type a message..."
+          className="flex-1 p-4 outline-none border-1 rounded-xl"
+          placeholder="Write your message here..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />

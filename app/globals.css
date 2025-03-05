@@ -5,6 +5,10 @@
   --foreground: #171717;
 }
 
+@theme {
+  --color-secondary: #1e1e1e;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -16,4 +20,25 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: "Poppins", sans-serif;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8885;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background: #5555;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+::-webkit-scrollbar-track:hover {
+  background: #555;
+}
+
+::-webkit-scrollbar {
+  width: 0.5vw;
 }
