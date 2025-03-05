@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 
+import { IoSend } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
 import { FaRegUser } from "react-icons/fa";
 
@@ -83,7 +84,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col gap-4">
+    <div className="h-screen flex flex-col gap-4 mx-60">
       <div className="flex-1 bg-neutral-900 px-4 py-2 mx-4 mt-4 rounded-xl overflow-y-auto">
         <div className="px-4 py-2">
           {messages.map((msg, index) => (
@@ -158,7 +159,7 @@ const Chat = () => {
           type="submit"
           className="px-4 py-2 bg-blue-500 text-white rounded-xl"
         >
-          Send
+          <IoSend size={24} />
         </button>
       </form>
     </div>

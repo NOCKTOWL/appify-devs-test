@@ -13,7 +13,7 @@ export default function Home() {
   });
   return (
     <>
-      <div className="h-screen grid grid-cols-6 gap-4">
+      <div className="h-screen grid grid-cols-6 gap-4 bg-zinc-900">
         <div className="col-span-1">
           <Sidebar />
         </div>
