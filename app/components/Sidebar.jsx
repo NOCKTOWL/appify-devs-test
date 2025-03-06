@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
+
+import { gsap } from "gsap";
+
+import { IoMdMore } from "react-icons/io";
+import { IoTrashOutline } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
 import { RiChatAiLine } from "react-icons/ri";
 
@@ -15,6 +20,10 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
 const Sidebar = () => {
+  const [moreModal, setMoreModal] = useState(false);
+
+  const moreModalRef = useRef(null);
+
   const [chatSessions, setChatSessions] = useState(
     JSON.parse(localStorage.getItem("chatHistory")) || []
   );
@@ -55,6 +64,12 @@ const Sidebar = () => {
     return acc;
   }, {});
 
+  gsap.to(moreModalRef.current, {
+    duration: 0.2,
+    opacity: moreModal ? 1 : 0,
+    pointerEvents: moreModal ? "all" : "none",
+  });
+
   return (
     <div className="h-full rounded flex flex-col gap-4 p-4 bg-neutral-900">
       <div className="w-full flex items-center justify-center gap-4 px-4 py-2 border-1 rounded-xl">
@@ -77,13 +92,31 @@ const Sidebar = () => {
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className="w-full flex items-center justify-between px-4 py-2 mb-2 bg-neutral-700 text-white rounded-xl text-sm cursor-pointer hover:brightness-125 transition-all duration-150"
+                className="relative w-full flex items-center justify-between px-4 py-2 mb-2 bg-neutral-700 text-white rounded-xl text-sm cursor-pointer hover:brightness-125 transition-all duration-150"
               >
                 <h1 className="line-clamp-1">
                   {session.messages.length > 0
                     ? session.messages[0].user
                     : "New Chat"}
                 </h1>
+                <div
+                  className="hover:bg-neutral-800 p-1 rounded-full transition-all duration-150"
+                  onClick={() => setMoreModal(!moreModal)}
+                >
+                  <IoMdMore size={20} />
+                </div>
+                {moreModal && (
+                  <div className="absolute top-full left-0 w-full bg-neutral-800 p-2 rounded-xl z-[-1] animate-modalAnimation">
+                    <ul className="flex flex-col gap-2">
+                      <li className="hover:bg-neutral-800 transition-all duration-150">
+                        Edit
+                      </li>
+                      <li className="hover:bg-neutral-800 transition-all duration-150">
+                        Delete
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
             ))}
           </div>
