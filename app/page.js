@@ -10,11 +10,16 @@ import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 
 export default function Home() {
   const [profileDropdown, setProfileDropdown] = useState(false);
+  const [hasChatHistory, setHasChatHistory] = useState(false);
   useEffect(() => {
-    if (localStorage.length === 0) {
-      localStorage.setItem("chatHistory", JSON.stringify([]));
+    if (typeof window === "undefined") {
+      if (!localStorage.getItem("chatHistory")) {
+        localStorage.setItem("chatHistory", JSON.stringify([]));
+      }
+      setHasChatHistory(localStorage.getItem("chatHistory") !== "[]");
     }
-  });
+  }, []);
+
   return (
     <>
       <div className="h-screen grid grid-cols-6 gap-4 bg-zinc-900">
@@ -45,7 +50,7 @@ export default function Home() {
           <Sidebar />
         </div>
         <div className="col-span-5">
-          {localStorage.length === 0 ? <LandingPage /> : <Chat />}
+          {hasChatHistory ? <LandingPage /> : <Chat />}
         </div>
       </div>
     </>
