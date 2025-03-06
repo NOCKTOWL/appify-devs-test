@@ -24,9 +24,14 @@ const Sidebar = () => {
 
   const moreModalRef = useRef(null);
 
-  const [chatSessions, setChatSessions] = useState(
-    JSON.parse(localStorage.getItem("chatHistory")) || []
-  );
+  const [chatSessions, setChatSessions] = useState([]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
+      setChatSessions(storedChats);
+    }
+  }, []);
 
   const createNewChat = () => {
     const newChatId = uuidv4();
