@@ -79,7 +79,7 @@ const Sidebar = () => {
 
   return (
     <div className="h-full rounded flex flex-col gap-4 p-4 bg-neutral-900">
-      <div className="w-full flex items-center justify-center gap-4 px-4 py-2 border-1 rounded-xl">
+      <div className="w-full flex items-center justify-center gap-4 px-4 py-2 rounded-xl">
         <SiRobotframework size={24} />
         <h1 className="text-xl">Appify AI</h1>
       </div>
@@ -124,7 +124,7 @@ const Sidebar = () => {
                         <RiEditLine size={20} />
                         Edit
                       </li>
-                      <li className="flex items-center justify-start gap-4  hover:bg-neutral-700 px-2 py-1 rounded cursor-pointer text-red-400">
+                      <li className="flex items-center justify-start gap-4 hover:bg-neutral-700 px-2 py-1 rounded cursor-pointer text-red-400">
                         <IoTrashOutline size={20} />
                         Delete
                       </li>

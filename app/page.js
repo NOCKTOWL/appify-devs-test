@@ -21,7 +21,7 @@ export default function Home() {
       setHasChatHistory(localStorage.getItem("chatHistory") !== "[]");
     }
   }, []);
-
+  console.log(hasChatHistory);
   return (
     <>
       <div className="h-screen grid grid-cols-6 gap-4 z-[2]">
@@ -74,7 +74,7 @@ export default function Home() {
           <Sidebar />
         </div>
         <div className="col-span-5">
-          {hasChatHistory ? <LandingPage /> : <Chat />}
+          {hasChatHistory ? <Chat /> : <LandingPage />}
         </div>
       </div>
       <GridPattern />
