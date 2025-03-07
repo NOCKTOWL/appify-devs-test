@@ -2,14 +2,11 @@
 
 import { useEffect, useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-
 import { gsap } from "gsap";
-
 import { IoMdMore } from "react-icons/io";
 import { IoTrashOutline } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
-import { RiChatAiLine } from "react-icons/ri";
-
+import { RiChatAiLine, RiEditLine } from "react-icons/ri";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import isToday from "dayjs/plugin/isToday";
@@ -20,36 +17,48 @@ dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
 const Sidebar = () => {
-  const [moreModal, setMoreModal] = useState(false);
-
+  const [moreModal, setMoreModal] = useState({});
   const moreModalRef = useRef(null);
-
   const [chatSessions, setChatSessions] = useState([]);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
+    if (typeof window !== "undefined") {
       const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
       setChatSessions(storedChats);
     }
   }, []);
 
-  const createNewChat = () => {
-    const newChatId = uuidv4();
-    localStorage.setItem("newChatId", newChatId);
-    window.location.reload();
-  };
-
   useEffect(() => {
-    const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
-    setChatSessions(storedChats);
+    const handleClickOutside = (event) => {
+      if (
+        moreModalRef.current &&
+        !moreModalRef.current.contains(event.target)
+      ) {
+        setMoreModal({});
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const groupedChats = chatSessions.reduce((acc, session) => {
-    if (!session.messages.length) return acc; // Ignore empty chats
+  const createNewChat = () => {
+    if (typeof window !== "undefined") {
+      const newChatId = uuidv4();
+      localStorage.setItem("newChatId", newChatId);
+      window.location.reload();
+    }
+  };
 
+  const toggleModal = (sessionId) => {
+    setMoreModal((prev) => ({
+      [sessionId]: !prev[sessionId],
+    }));
+  };
+
+  const groupedChats = chatSessions.reduce((acc, session) => {
+    if (!session.messages.length) return acc;
     const sessionDate = dayjs(session.timestamp);
     let groupKey;
-
     if (sessionDate.isToday()) {
       groupKey = "Today";
     } else if (sessionDate.isYesterday()) {
@@ -61,19 +70,12 @@ const Sidebar = () => {
     } else {
       groupKey = sessionDate.format("MMMM YYYY");
     }
-
     if (!acc[groupKey]) {
       acc[groupKey] = [];
     }
     acc[groupKey].push(session);
     return acc;
   }, {});
-
-  gsap.to(moreModalRef.current, {
-    duration: 0.2,
-    opacity: moreModal ? 1 : 0,
-    pointerEvents: moreModal ? "all" : "none",
-  });
 
   return (
     <div className="h-full rounded flex flex-col gap-4 p-4 bg-neutral-900">
@@ -106,17 +108,24 @@ const Sidebar = () => {
                 </h1>
                 <div
                   className="hover:bg-neutral-800 p-1 rounded-full transition-all duration-150"
-                  onClick={() => setMoreModal(!moreModal)}
+                  onClick={(e) => {
+                    toggleModal(session.id);
+                  }}
                 >
                   <IoMdMore size={20} />
                 </div>
-                {moreModal && (
-                  <div className="absolute top-full left-0 w-full bg-neutral-800 p-2 rounded-xl z-[-1] animate-modalAnimation">
+                {moreModal[session.id] && (
+                  <div
+                    ref={moreModalRef}
+                    className="absolute top-full left-0 w-full bg-neutral-800 p-2 mt-2 rounded-xl z-10 animate-modalAnimation"
+                  >
                     <ul className="flex flex-col gap-2">
-                      <li className="hover:bg-neutral-800 transition-all duration-150">
+                      <li className="flex items-center justify-start gap-4 hover:bg-neutral-700 px-2 py-1 rounded cursor-pointer">
+                        <RiEditLine size={20} />
                         Edit
                       </li>
-                      <li className="hover:bg-neutral-800 transition-all duration-150">
+                      <li className="flex items-center justify-start gap-4  hover:bg-neutral-700 px-2 py-1 rounded cursor-pointer text-red-400">
+                        <IoTrashOutline size={20} />
                         Delete
                       </li>
                     </ul>

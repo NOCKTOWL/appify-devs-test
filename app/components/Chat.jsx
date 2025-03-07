@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 
-import { IoSend } from "react-icons/io5";
+import { IoSend, IoAttach } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
 import { FaRegUser } from "react-icons/fa";
 
@@ -145,22 +145,29 @@ const Chat = () => {
       </div>
       <form
         action="submit"
-        className="flex gap-4 p-4"
+        className="relative flex mx-4 border-1 rounded-4xl"
         onSubmit={(e) => handleSubmit(e)}
       >
         <input
           type="text"
-          className="flex-1 p-4 outline-none border-1 rounded-xl"
+          className="flex-1 p-4 outline-none resize-none"
           placeholder="Write your message here..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-xl"
-        >
-          <IoSend size={24} />
-        </button>
+        <div className="flex p-4">
+          <div className="flex items-center justify-center">
+            <button className="p-4 text-white rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer">
+              <IoAttach size={28} />
+            </button>
+            <button
+              type="submit"
+              className="p-4 text-white rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer"
+            >
+              <IoSend size={24} />
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );
