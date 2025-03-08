@@ -8,7 +8,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Appify Test GPT",
+  title: "Appify AI",
   description: "This is my test submission for Appify Devs",
 };
 

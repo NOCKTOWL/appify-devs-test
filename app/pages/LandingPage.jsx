@@ -50,10 +50,11 @@ const LandingPage = () => {
       ease: "power3.out",
     });
   }, []);
+
   return (
     <>
       <Profile />
-      <div className="absolute top-0 left-0 p-4 flex items-center gap-2">
+      <div className="absolute top-0 left-0 p-4 flex items-center gap-2 z-20">
         <SiRobotframework size={28} className="text-indigo-500" />
         <h1 className="text-2xl">Appify AI</h1>
       </div>
