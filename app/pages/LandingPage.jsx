@@ -1,6 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
+
+import Profile from "../components/Profile";
+
+import { FaPlus, FaArrowRight } from "react-icons/fa6";
 import { SiRobotframework } from "react-icons/si";
 
 const LandingPage = () => {
@@ -13,6 +17,7 @@ const LandingPage = () => {
   };
   return (
     <>
+      <Profile />
       <div className="absolute top-0 left-0 p-4 flex items-center gap-2">
         <SiRobotframework size={28} />
         <h1 className="text-2xl">Appify AI</h1>
@@ -39,23 +44,37 @@ const LandingPage = () => {
           </li>
         </ul>
       </nav>
-      <div className="h-full flex flex-col gap-16 items-center justify-center">
+      <div className="h-full flex flex-col gap-32 items-center justify-center">
         <div className="px-8 py-4 text-center">
-          <h1 className="text-6xl">Welcome to</h1>
-          <h1 className="text-6xl font-bold">Appify AI ChatBot!</h1>
+          <h1
+            className="text-3xl mb-4"
+            data-cursor-effects="true"
+            data-cursor-blend
+          >
+            Welcome to
+          </h1>
+          <h1
+            className="text-8xl font-bold"
+            data-cursor-effects="true"
+            data-cursor-blend
+          >
+            Appify AI
+          </h1>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-8 items-center text-2xl">
           <Link
             href="/chat"
-            className="px-4 py-2 border-1 rounded-lg cursor-pointer hover:border-indigo-500 transition-all duration-200"
+            className="group flex items-center gap-2 px-4 py-2 border-1 rounded-lg cursor-pointer hover:border-indigo-500 transition-all duration-200"
           >
             New chat
+            <FaPlus className="group-hover:text-indigo-500 transition-all duration-200" />
           </Link>
           <Link
             href="https://appifydevs.com"
-            className="bg-indigo-500 px-4 py-2 rounded-lg cursor-pointer hover:bg-indigo-600 text-white transition-all duration-200"
+            className="flex items-center gap-2 bg-indigo-500 px-4 py-2 rounded-lg cursor-pointer hover:bg-indigo-600 text-white transition-all duration-200"
           >
             Explore us
+            <FaArrowRight className="-rotate-45" />
           </Link>
         </div>
       </div>
