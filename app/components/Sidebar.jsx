@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { gsap } from "gsap";
 
+import Link from "next/link";
+
 import {
   TbLayoutSidebarLeftCollapse,
   TbLayoutSidebarRightCollapse,
@@ -22,6 +24,74 @@ dayjs.extend(relativeTime);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 
+const dummyChats = [
+  {
+    id: "c1a2b3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6",
+    timestamp: new Date().toISOString(), // Today
+    messages: [
+      {
+        user: "How to build a React app?",
+        response:
+          "To build a React app, you can start with Create React App which is a comfortable environment for learning React. To create a project, run: npx create-react-app my-app cd my-app npm start",
+      },
+      {
+        user: "What about Next.js?",
+        response:
+          "Next.js is a popular React framework that adds features like server-side rendering and static site generation. To create a Next.js app, run: npx create-next-app@latest",
+      },
+    ],
+    isNew: false,
+  },
+  {
+    id: "d4e5f6g7-h8i9-j0k1-l2m3-n4o5p6q7r8s9",
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
+    messages: [
+      {
+        user: "Explain AI models",
+        response:
+          "AI models are computational systems designed to perform tasks that typically require human intelligence. They learn patterns from data and make predictions or decisions based on that learning.",
+      },
+    ],
+    isNew: false,
+  },
+  {
+    id: "g7h8i9j0-k1l2-m3n4-o5p6-q7r8s9t0u1v2",
+    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+    messages: [
+      {
+        user: "JavaScript vs TypeScript",
+        response:
+          "JavaScript is a dynamically typed language while TypeScript is a statically typed superset of JavaScript. TypeScript adds optional static typing and class-based object-oriented programming to JavaScript.",
+      },
+    ],
+    isNew: false,
+  },
+  {
+    id: "j0k1l2m3-n4o5-p6q7-r8s9-t0u1v2w3x4y5",
+    timestamp: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
+    messages: [
+      {
+        user: "Best UI libraries for React",
+        response:
+          "Some popular UI libraries for React include Material-UI, Chakra UI, Ant Design, Tailwind CSS, and Bootstrap. Each has its own design philosophy and component set.",
+      },
+    ],
+    isNew: false,
+  },
+  {
+    id: "m3n4o5p6-q7r8-s9t0-u1v2-w3x4y5z6a7b8",
+    timestamp: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000).toISOString(), // Last month
+    messages: [
+      {
+        user: "How to deploy a Next.js app?",
+        response:
+          "You can deploy a Next.js app on Vercel, Netlify, or any other hosting platform that supports Node.js. Vercel is created by the same team behind Next.js and offers the best integration.",
+      },
+    ],
+    isNew: false,
+  },
+];
+
 const Sidebar = () => {
   const [moreModal, setMoreModal] = useState({});
   const [chatSessions, setChatSessions] = useState([]);
@@ -34,7 +104,13 @@ const Sidebar = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedChats = JSON.parse(localStorage.getItem("chatHistory")) || [];
-      setChatSessions(storedChats);
+
+      if (storedChats.length === 0) {
+        localStorage.setItem("chatHistory", JSON.stringify(dummyChats));
+        setChatSessions(dummyChats);
+      } else {
+        setChatSessions(storedChats);
+      }
     }
   }, []);
 
@@ -239,7 +315,8 @@ const Sidebar = () => {
         />
       )}
       <div className="flex items-center justify-between">
-        <div
+        <Link
+          href="/"
           className={`w-full flex items-center ${
             isCollapsed ? "justify-center" : "justify-start"
           } gap-4 px-4 py-2 rounded-xl`}
@@ -249,7 +326,7 @@ const Sidebar = () => {
             className="text-indigo-500"
           />
           {isCollapsed ? "" : <h1 className="text-xl">Appify AI</h1>}
-        </div>
+        </Link>
       </div>
       <div className="w-full flex-1 flex flex-col items-start justify-start px-4 py-2 rounded-xl">
         <button

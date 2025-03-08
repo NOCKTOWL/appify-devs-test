@@ -15,20 +15,14 @@ import { FaRegUser } from "react-icons/fa";
 const Chat = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-
   const [loading, setLoading] = useState(false);
+
+  const [animatingIndex, setAnimatingIndex] = useState(null);
 
   gsap.registerPlugin(TextPlugin);
 
   const chatRef = useRef(null);
-
-  // gsap.to(chatRef.current, {
-  //   duration: response.length * 0.01,
-  //   delay: 1,
-  //   text: response,
-  //   ease: "none",
-  //   repeat: 0,
-  // });
+  const responseRefs = useRef({});
 
   useEffect(() => {
     const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
@@ -90,6 +84,9 @@ const Chat = () => {
 
       localStorage.setItem("chatHistory", JSON.stringify(sessions));
       setMessages([...currentSession.messages]);
+
+      setAnimatingIndex(currentSession.messages.length - 1);
+
       window.dispatchEvent(event);
 
       setMessage("");
@@ -101,10 +98,47 @@ const Chat = () => {
 
       localStorage.setItem("chatHistory", JSON.stringify(sessions));
       setMessages([...currentSession.messages]);
+      setAnimatingIndex(currentSession.messages.length - 1);
     } finally {
       setLoading(false);
     }
   };
+
+  const getResponseRef = (index) => {
+    if (!responseRefs.current[index]) {
+      responseRefs.current[index] = React.createRef();
+    }
+    return responseRefs.current[index];
+  };
+
+  useEffect(() => {
+    if (
+      animatingIndex !== null &&
+      messages[animatingIndex] &&
+      !messages[animatingIndex].isLoading
+    ) {
+      const responseText = messages[animatingIndex].response;
+      const responseElement = responseRefs.current[animatingIndex]?.current;
+
+      if (responseElement && responseText) {
+        // First set the element to empty
+        responseElement.textContent = "";
+
+        // Then animate the text appearing
+        gsap.to(responseElement, {
+          duration: Math.min(responseText.length * 0.01, 3), // Cap at 3 seconds for very long responses
+          text: {
+            value: responseText,
+            delimiter: "", // No delimiter means character by character
+          },
+          ease: "none",
+          onComplete: () => {
+            setAnimatingIndex(null); // Reset animating index when done
+          },
+        });
+      }
+    }
+  }, [animatingIndex, messages]);
 
   return (
     <div className="h-screen flex flex-col gap-4 mx-60">
@@ -136,7 +170,7 @@ const Chat = () => {
                       <source src="/loader_dots.webm" type="video/webm" />
                     </video>
                   ) : (
-                    msg.response
+                    <div ref={getResponseRef(index)}>{msg.response}</div>
                   )}
                 </div>
               </div>
@@ -175,7 +209,7 @@ const Chat = () => {
       </div>
       <form
         action="submit"
-        className="relative flex mx-4 border-1 rounded-4xl"
+        className="relative flex mb-12 mx-4 border-1 rounded-4xl"
         onSubmit={(e) => handleSubmit(e)}
       >
         <input
@@ -188,12 +222,12 @@ const Chat = () => {
         />
         <div className="flex p-4">
           <div className="flex items-center justify-center">
-            <button className="p-4 text-white rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer">
+            <button className="p-4 text-white rounded-full hover:bg-neutral-800 transition-all duration-150 cursor-pointer">
               <IoAttach size={28} />
             </button>
             <button
               type="submit"
-              className="p-4 text-indigo-500 rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer"
+              className="p-4 text-indigo-500 rounded-full hover:bg-neutral-800 transition-all duration-150 cursor-pointer"
               disabled={loading}
             >
               <IoSend size={24} />
