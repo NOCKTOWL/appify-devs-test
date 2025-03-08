@@ -8,7 +8,7 @@ import { TextPlugin } from "gsap/TextPlugin";
 
 import Profile from "./Profile";
 
-import { IoSend, IoAttach } from "react-icons/io5";
+import { IoSend, IoAttach, IoCopy, IoCheckmark } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
 import { FaRegUser } from "react-icons/fa";
 
@@ -16,6 +16,7 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState(null);
 
   const [animatingIndex, setAnimatingIndex] = useState(null);
 
@@ -121,24 +122,30 @@ const Chat = () => {
       const responseElement = responseRefs.current[animatingIndex]?.current;
 
       if (responseElement && responseText) {
-        // First set the element to empty
         responseElement.textContent = "";
 
         // Then animate the text appearing
         gsap.to(responseElement, {
-          duration: Math.min(responseText.length * 0.01, 3), // Cap at 3 seconds for very long responses
+          duration: Math.min(responseText.length * 0.01, 3),
           text: {
             value: responseText,
-            delimiter: "", // No delimiter means character by character
+            delimiter: "",
           },
           ease: "none",
           onComplete: () => {
-            setAnimatingIndex(null); // Reset animating index when done
+            setAnimatingIndex(null);
           },
         });
       }
     }
   }, [animatingIndex, messages]);
+
+  const copyToClipboard = (text, index) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedIndex(index);
+      setTimeout(() => setCopiedIndex(null), 2000);
+    });
+  };
 
   return (
     <div className="h-screen flex flex-col gap-4 mx-60">
@@ -159,19 +166,39 @@ const Chat = () => {
               </div>
               <div className="flex justify-start">
                 <div
-                  className="flex items-center w-max px-4 py-2 text-white rounded-xl"
+                  className="flex items-center w-max px-4 py-2 text-white rounded-xl "
                   ref={chatRef}
                 >
                   <div className="bg-neutral-700 rounded-full p-4 mr-4">
                     <SiRobotframework size={20} />
                   </div>
-                  {msg.isLoading ? (
-                    <video autoPlay loop muted className="w-12 h-12">
-                      <source src="/loader_dots.webm" type="video/webm" />
-                    </video>
-                  ) : (
-                    <div ref={getResponseRef(index)}>{msg.response}</div>
-                  )}
+                  <div className="flex items-center w-full p-4 rounded-xl bg-neutral-800">
+                    {msg.isLoading ? (
+                      <video autoPlay loop muted className="w-12 h-12">
+                        <source src="/loader_dots.webm" type="video/webm" />
+                      </video>
+                    ) : (
+                      <div ref={getResponseRef(index)}>{msg.response}</div>
+                    )}
+                    {!msg.isLoading && msg.response && (
+                      <button
+                        onClick={() => copyToClipboard(msg.response, index)}
+                        className="self-end pl-8 mt-2 flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-200 transition-colors duration-150 cursor-pointer"
+                      >
+                        {copiedIndex === index ? (
+                          <>
+                            <IoCheckmark size={16} className="text-green-500" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <IoCopy size={14} />
+                            Copy
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
