@@ -29,6 +29,34 @@ const Sidebar = () => {
   }, []);
 
   useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === "chatHistory") {
+        const updatedChats = JSON.parse(e.newValue) || [];
+        setChatSessions(updatedChats);
+      }
+    };
+
+    const handleCustomStorageChange = (e) => {
+      if (e.detail && e.detail.key === "chatHistory") {
+        const updatedChats =
+          JSON.parse(localStorage.getItem("chatHistory")) || [];
+        setChatSessions(updatedChats);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("localStorageChange", handleCustomStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener(
+        "localStorageChange",
+        handleCustomStorageChange
+      );
+    };
+  }, []);
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (
         moreModalRef.current &&
@@ -45,7 +73,24 @@ const Sidebar = () => {
     if (typeof window !== "undefined") {
       const newChatId = uuidv4();
       localStorage.setItem("newChatId", newChatId);
-      window.location.reload();
+
+      const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
+      const newSession = {
+        id: newChatId,
+        timestamp: new Date().toISOString(),
+        messages: [],
+        isNew: true,
+      };
+
+      sessions.push(newSession);
+      localStorage.setItem("chatHistory", JSON.stringify(sessions));
+
+      const event = new CustomEvent("localStorageChange", {
+        detail: { key: "chatHistory" },
+      });
+      window.dispatchEvent(event);
+
+      setChatSessions(sessions);
     }
   };
 

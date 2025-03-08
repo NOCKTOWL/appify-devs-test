@@ -6,13 +6,14 @@ import { v4 as uuidv4 } from "uuid";
 import { gsap } from "gsap";
 import { TextPlugin } from "gsap/TextPlugin";
 
+import Profile from "./Profile";
+
 import { IoSend, IoAttach } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
 import { FaRegUser } from "react-icons/fa";
 
 const Chat = () => {
   const [message, setMessage] = useState("");
-  const [response, setResponses] = useState("");
   const [messages, setMessages] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -28,6 +29,7 @@ const Chat = () => {
   //   ease: "none",
   //   repeat: 0,
   // });
+
   useEffect(() => {
     const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
     const lastSession =
@@ -39,6 +41,10 @@ const Chat = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!message.trim()) return;
+
+    setLoading(true);
 
     const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
     let currentSession =
@@ -52,46 +58,64 @@ const Chat = () => {
       };
       sessions.push(currentSession);
     }
+
+    const userMessageObj = { user: message, isLoading: true };
+    currentSession.messages.push(userMessageObj);
+
+    localStorage.setItem("chatHistory", JSON.stringify(sessions));
+    setMessages([...currentSession.messages]);
+
+    const event = new CustomEvent("localStorageChange", {
+      detail: { key: "chatHistory" },
+    });
+    window.dispatchEvent(event);
+
     try {
-      axios
-        .post(
-          "https://api.echogpt.live/v1/chat/completions",
-          {
-            messages: [
-              // { role: "system", content: "You are a helpful assistant." },
-              { role: "user", content: message },
-            ],
-            model: "EchoGPT",
-          },
-          {
-            headers: { "x-api-key": process.env.NEXT_PUBLIC_ECHO_API_KEY },
-          }
-        )
-        .then((response) => {
-          console.log(response.data);
-          currentSession.messages.push({
-            user: message,
-            response: response.data.choices[0].message.content,
-          });
-          localStorage.setItem("chatHistory", JSON.stringify(sessions));
-          setMessages([...currentSession.messages]);
-          setMessage("");
-        })
-        .catch((error) => console.error(error));
+      const response = await axios.post(
+        "https://api.echogpt.live/v1/chat/completions",
+        {
+          messages: [
+            // { role: "system", content: "You are a helpful assistant." },
+            { role: "user", content: message },
+          ],
+          model: "EchoGPT",
+        },
+        {
+          headers: { "x-api-key": process.env.NEXT_PUBLIC_ECHO_API_KEY },
+        }
+      );
+
+      userMessageObj.response = response.data.choices[0].message.content;
+      userMessageObj.isLoading = false;
+
+      localStorage.setItem("chatHistory", JSON.stringify(sessions));
+      setMessages([...currentSession.messages]);
+      window.dispatchEvent(event);
+
+      setMessage("");
     } catch (err) {
       console.error(err);
+      userMessageObj.response =
+        "Sorry, There was an error processing your request. Please try again.";
+      userMessageObj.isLoading = false;
+
+      localStorage.setItem("chatHistory", JSON.stringify(sessions));
+      setMessages([...currentSession.messages]);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="h-screen flex flex-col gap-4 mx-60">
       <div className="flex-1 bg-neutral-900 px-4 py-2 mx-4 mt-4 rounded-xl overflow-y-auto">
+        <Profile />
         <div className="px-4 py-2">
           {messages.map((msg, index) => (
-            <div key={index} className="w-full flex flex-col gap-4">
+            <div key={index} className="w-full flex flex-col gap-4 mb-6">
               <div className="flex justify-end">
                 <div className="flex items-center max-w-1/2 text-white">
-                  <div className="px-4 py-2 bg-blue-400 rounded-xl">
+                  <div className="px-4 py-2 bg-indigo-400 rounded-xl">
                     {msg.user}
                   </div>
                   <div className="bg-neutral-700 rounded-full p-4 ml-4">
@@ -107,7 +131,13 @@ const Chat = () => {
                   <div className="bg-neutral-700 rounded-full p-4 mr-4">
                     <SiRobotframework size={20} />
                   </div>
-                  {msg.response}
+                  {msg.isLoading ? (
+                    <video autoPlay loop muted className="w-12 h-12">
+                      <source src="/loader_dots.webm" type="video/webm" />
+                    </video>
+                  ) : (
+                    msg.response
+                  )}
                 </div>
               </div>
             </div>
@@ -154,6 +184,7 @@ const Chat = () => {
           placeholder="Write your message here..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          disabled={loading}
         />
         <div className="flex p-4">
           <div className="flex items-center justify-center">
@@ -163,6 +194,7 @@ const Chat = () => {
             <button
               type="submit"
               className="p-4 text-white rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer"
+              disabled={loading}
             >
               <IoSend size={24} />
             </button>
