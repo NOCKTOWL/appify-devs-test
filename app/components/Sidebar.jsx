@@ -11,7 +11,7 @@ import {
   TbLayoutSidebarRightCollapse,
 } from "react-icons/tb";
 import { IoMdMore } from "react-icons/io";
-import { IoTrashOutline } from "react-icons/io5";
+import { IoTrashOutline, IoHelpCircleOutline } from "react-icons/io5";
 import { SiRobotframework } from "react-icons/si";
 import { RiChatAiLine, RiEditLine } from "react-icons/ri";
 
@@ -304,13 +304,13 @@ const Sidebar = () => {
       {isCollapsed ? (
         <TbLayoutSidebarRightCollapse
           size={28}
-          className="absolute -right-4 mt-2 text-white cursor-pointer"
+          className="absolute -right-4 mt-2 text-zinc-200 hover:text-zinc-400 cursor-pointer transition-all duration-150"
           onClick={toggleSidebar}
         />
       ) : (
         <TbLayoutSidebarLeftCollapse
           size={28}
-          className="absolute -right-4 mt-2 text-white cursor-pointer"
+          className="absolute -right-4 mt-2 text-zinc-200 hover:text-zinc-400 cursor-pointer transition-all duration-150"
           onClick={toggleSidebar}
         />
       )}
@@ -387,6 +387,12 @@ const Sidebar = () => {
               ))}
             </div>
           ))}
+      </div>
+      <div className="flex items-center justify-center gap-4 p-4">
+        <Link href="#" className="flex items-center gap-2 text-neutral-400">
+          <IoHelpCircleOutline className="text-xl" />
+          Help
+        </Link>
       </div>
     </div>
   );

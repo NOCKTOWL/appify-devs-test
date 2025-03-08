@@ -9,6 +9,7 @@ import { SiRobotframework } from "react-icons/si";
 
 const LandingPage = () => {
   const titleRef = useRef(null);
+  const subtitleRef = useRef(null);
   const navRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -16,6 +17,13 @@ const LandingPage = () => {
     gsap.from(titleRef.current, {
       duration: 1,
       y: 60,
+      opacity: 0,
+      ease: "power3.out",
+    });
+
+    gsap.from(subtitleRef.current, {
+      delay: 0.5,
+      duration: 1,
       opacity: 0,
       ease: "power3.out",
     });
@@ -87,13 +95,21 @@ const LandingPage = () => {
             Welcome to
           </h1>
           <h1
-            className="text-8xl font-bold"
+            className="text-8xl font-bold mb-8"
             data-cursor-effects="true"
             data-cursor-blend
             ref={titleRef}
           >
             Appify AI
           </h1>
+          <p
+            className="text-base font-light tracking-widest"
+            ref={subtitleRef}
+            data-cursor-effects="true"
+            data-cursor-blend
+          >
+            Get started by creating a new chat
+          </p>
         </div>
         <div
           id="buttonRef"

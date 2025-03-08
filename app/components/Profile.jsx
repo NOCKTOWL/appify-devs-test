@@ -15,7 +15,10 @@ const Profile = () => {
           >
             Log In
           </button>
-          <button className="bg-neutral-300 rounded-lg px-4 py-2 cursor-pointer text-zinc-800 hover:inset-shadow-sm hover:inset-shadow-indigo-500 transition-all duration-300">
+          <button
+            className="bg-neutral-300 rounded-lg px-4 py-2 cursor-pointer text-zinc-800 hover:inset-shadow-sm hover:inset-shadow-indigo-500 transition-all duration-300"
+            title="Dummy Sign Up Button"
+          >
             Sign Up
           </button>
         </div>
