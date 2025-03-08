@@ -156,9 +156,11 @@ const Sidebar = () => {
   }, []);
 
   const createNewChat = () => {
+    window.location.reload();
     if (typeof window !== "undefined") {
       const newChatId = uuidv4();
       localStorage.setItem("newChatId", newChatId);
+      localStorage.setItem("currentChatId", newChatId);
 
       const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
       const newSession = {
@@ -177,7 +179,21 @@ const Sidebar = () => {
       window.dispatchEvent(event);
 
       setChatSessions(sessions);
+
+      const chatEvent = new CustomEvent("chatSessionChange", {
+        detail: { sessionId: newChatId, isNew: true },
+      });
+      window.dispatchEvent(chatEvent);
     }
+  };
+
+  const selectChat = (sessionId) => {
+    localStorage.setItem("currentChatId", sessionId);
+
+    const event = new CustomEvent("chatSessionChange", {
+      detail: { id: sessionId },
+    });
+    window.dispatchEvent(event);
   };
 
   const toggleModal = (sessionId) => {
@@ -346,6 +362,7 @@ const Sidebar = () => {
                 <div
                   key={session.id}
                   className="relative w-full flex items-center justify-between px-4 py-2 mb-2 bg-neutral-700 text-white rounded-xl text-sm cursor-pointer hover:brightness-125 transition-all duration-150"
+                  onClick={() => selectChat(session.id)}
                 >
                   <h1 className="line-clamp-1">
                     {session.messages.length > 0
@@ -389,7 +406,11 @@ const Sidebar = () => {
           ))}
       </div>
       <div className="flex items-center justify-center gap-4 p-4">
-        <Link href="#" className="flex items-center gap-2 text-neutral-400">
+        <Link
+          href="#"
+          className="flex items-center gap-2 text-neutral-400"
+          title="Dummy Help Button"
+        >
           <IoHelpCircleOutline className="text-xl" />
           Help
         </Link>

@@ -13,6 +13,7 @@ import { SiRobotframework } from "react-icons/si";
 import { FaRegUser } from "react-icons/fa";
 
 const Chat = () => {
+  const [currentChatId, setCurrentChatId] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -26,12 +27,52 @@ const Chat = () => {
   const responseRefs = useRef({});
 
   useEffect(() => {
-    const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
-    const lastSession =
-      sessions.length > 0 ? sessions[sessions.length - 1] : null;
-    if (lastSession) {
-      setMessages([...lastSession.messages]);
-    }
+    const loadCurrentChat = () => {
+      const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
+      const currentId = localStorage.getItem("currentChatId");
+
+      if (currentId) {
+        const currentSession = sessions.find(
+          (session) => session.id === currentId
+        );
+        if (currentSession) {
+          setMessages([...currentSession.messages]);
+          setCurrentChatId(currentId);
+          return;
+        }
+      }
+
+      const lastSession =
+        sessions.length > 0 ? sessions[sessions.length - 1] : null;
+      if (lastSession) {
+        setMessages([...lastSession.messages]);
+        setCurrentChatId(lastSession.id);
+        localStorage.setItem("currentChatId", lastSession.id);
+      }
+    };
+
+    loadCurrentChat();
+
+    const handleChatSessionChange = (e) => {
+      if (e.detail && e.detail.id) {
+        const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
+        const session = sessions.find((s) => s.id === e.detail.id);
+
+        if (session) {
+          setMessages(session.messages || []);
+          setCurrentChatId(e.detail.id);
+        } else if (e.detail.isNew) {
+          setMessages([]);
+          setCurrentChatId(e.detail.id);
+        }
+      }
+    };
+
+    window.addEventListener("chatSessionChange", handleChatSessionChange);
+
+    return () => {
+      window.removeEventListener("chatSessionChange", handleChatSessionChange);
+    };
   }, []);
 
   const handleSubmit = async (e) => {
@@ -42,16 +83,27 @@ const Chat = () => {
     setLoading(true);
 
     const sessions = JSON.parse(localStorage.getItem("chatHistory")) || [];
-    let currentSession =
-      sessions.length > 0 ? sessions[sessions.length - 1] : null;
+    let currentSession = currentChatId
+      ? sessions.find((s) => s.id === currentChatId)
+      : sessions.length > 0
+      ? sessions[sessions.length - 1]
+      : null;
+
     if (!currentSession || currentSession.isNew) {
-      currentSession = {
-        id: uuidv4(),
-        timestamp: new Date().toLocaleString(),
-        messages: [],
-        isNew: false,
-      };
-      sessions.push(currentSession);
+      if (currentSession && currentSession.isNew) {
+        currentSession.isNew = false;
+      } else {
+        const newId = uuidv4();
+        currentSession = {
+          id: newId,
+          timestamp: new Date().toLocaleString(),
+          messages: [],
+          isNew: false,
+        };
+        sessions.push(currentSession);
+        setCurrentChatId(newId);
+        localStorage.setItem("currentChatId", newId);
+      }
     }
 
     const userMessageObj = { user: message, isLoading: true };
@@ -148,8 +200,16 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col gap-4 mx-60">
-      <div className="flex-1 bg-neutral-900 px-4 py-2 mx-4 mt-4 rounded-xl overflow-y-auto">
+    <div
+      className={`h-screen flex flex-col gap-4 mx-60 transition-all duration-700 ease-out ${
+        messages.length > 0 ? "" : "justify-center"
+      }`}
+    >
+      <div
+        className={` bg-neutral-900 mx-4 mt-4 rounded-xl overflow-y-auto transition-all duration-1000 ease-in-out ${
+          messages.length > 0 ? "flex-1 px-4 py-2" : "flex-0"
+        }`}
+      >
         <Profile />
         <div className="px-4 py-2">
           {messages.map((msg, index) => (
@@ -236,7 +296,7 @@ const Chat = () => {
       </div>
       <form
         action="submit"
-        className="relative flex mb-12 mx-4 border-1 rounded-4xl"
+        className={`relative flex mb-12 mx-4 border-1 border-zinc-400 rounded-4xl bg-neutral-900`}
         onSubmit={(e) => handleSubmit(e)}
       >
         <input
