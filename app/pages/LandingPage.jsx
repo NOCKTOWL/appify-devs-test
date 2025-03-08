@@ -1,6 +1,6 @@
-import React from "react";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import Link from "next/link";
-import { v4 as uuidv4 } from "uuid";
 
 import Profile from "../components/Profile";
 
@@ -8,37 +8,70 @@ import { FaPlus, FaArrowRight } from "react-icons/fa6";
 import { SiRobotframework } from "react-icons/si";
 
 const LandingPage = () => {
-  const createNewChat = () => {
-    if (typeof window !== "undefined") {
-      const newChatId = uuidv4();
-      localStorage.setItem("newChatId", newChatId);
-      window.location.reload();
-    }
-  };
+  const titleRef = useRef(null);
+  const navRef = useRef(null);
+  const buttonRef = useRef(null);
+
+  useEffect(() => {
+    gsap.from(titleRef.current, {
+      duration: 1,
+      y: 60,
+      opacity: 0,
+      ease: "power3.out",
+    });
+
+    gsap.from(navRef.current, {
+      duration: 1,
+      y: -60,
+      opacity: 0,
+      ease: "power3.out",
+    });
+
+    gsap.from(navRef.current.querySelectorAll("ul"), {
+      delay: 0.8,
+      gap: 20,
+      duration: 1,
+      ease: "power4.out",
+    });
+
+    gsap.from(buttonRef.current, {
+      delay: 0.3,
+      duration: 1,
+      y: 60,
+      opacity: 0,
+      ease: "power3.out",
+    });
+  }, []);
   return (
     <>
       <Profile />
       <div className="absolute top-0 left-0 p-4 flex items-center gap-2">
-        <SiRobotframework size={28} />
+        <SiRobotframework size={28} className="text-indigo-500" />
         <h1 className="text-2xl">Appify AI</h1>
       </div>
-      <nav className="absolute top-0 w-full mx-auto p-4 z-[1]">
-        <ul className="flex items-center justify-center gap-16 text-lg text-neutral-200 font-light">
+      <nav className="absolute top-0 w-full mx-auto p-4 z-[1]" ref={navRef}>
+        <ul className="flex items-center justify-center gap-20 text-lg text-neutral-200 font-light">
           <li
-            className="hover:text-indigo-400 transition-all duration-150 py-2 cursor-pointer"
+            className=" transition-all duration-150 py-2 cursor-pointer"
             title="Dummy About Button"
+            data-cursor-effects="true"
+            data-cursor-blend
           >
             About
           </li>
           <li
-            className="hover:text-indigo-400 transition-all duration-150  py-2 cursor-pointer"
+            className=" transition-all duration-150  py-2 cursor-pointer"
             title="Dummy Pricing Button"
+            data-cursor-effects="true"
+            data-cursor-blend
           >
             Pricing
           </li>
           <li
-            className="hover:text-indigo-400 transition-all duration-150  py-2 cursor-pointer"
+            className=" transition-all duration-150  py-2 cursor-pointer"
             title="Dummy Contact Button"
+            data-cursor-effects="true"
+            data-cursor-blend
           >
             Contact
           </li>
@@ -57,11 +90,16 @@ const LandingPage = () => {
             className="text-8xl font-bold"
             data-cursor-effects="true"
             data-cursor-blend
+            ref={titleRef}
           >
             Appify AI
           </h1>
         </div>
-        <div className="flex gap-8 items-center text-2xl">
+        <div
+          id="buttonRef"
+          className="flex gap-8 items-center text-2xl"
+          ref={buttonRef}
+        >
           <Link
             href="/chat"
             className="group flex items-center gap-2 px-4 py-2 border-1 rounded-lg cursor-pointer hover:border-indigo-500 transition-all duration-200"
@@ -71,7 +109,7 @@ const LandingPage = () => {
           </Link>
           <Link
             href="https://appifydevs.com"
-            className="flex items-center gap-2 bg-indigo-500 px-4 py-2 rounded-lg cursor-pointer hover:bg-indigo-600 text-white transition-all duration-200"
+            className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 px-4 py-2 rounded-lg cursor-pointer hover:bg-indigo-600 text-white transition-all duration-200"
           >
             Explore us
             <FaArrowRight className="-rotate-45" />

@@ -19,13 +19,13 @@ export default function Home() {
   console.log(hasChatHistory);
   return (
     <>
-        <Cursor />
-        <div className="h-screen gap-4">
-          <div className="h-full">
-            {hasChatHistory ? <ChatPage /> : <LandingPage />}
-          </div>
+      <Cursor />
+      <div className="h-screen gap-4">
+        <div className="h-full">
+          {hasChatHistory ? <ChatPage /> : <LandingPage />}
         </div>
-        <GridPattern />
+      </div>
+      <GridPattern />
     </>
   );
 }

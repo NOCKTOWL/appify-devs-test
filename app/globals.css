@@ -9,15 +9,16 @@
   --color-secondary: #1e1e1e;
 
   --animate-modalAnimation: modalAnimation 0.3s ease-in-out;
+  --animate-modalAnimationReverse: modalAnimation 0.3s ease-in-out reverse;
 
   @keyframes modalAnimation {
     0% {
-      /* opacity: 0; */
-      transform: translateY(-10px);
+      opacity: 0;
+      transform: translateX(-20px);
     }
     100% {
-      /* opacity: 1; */
-      transform: translateY(0);
+      opacity: 1;
+      transform: translateX(0);
     }
   }
 }

@@ -115,7 +115,7 @@ const Chat = () => {
             <div key={index} className="w-full flex flex-col gap-4 mb-6">
               <div className="flex justify-end">
                 <div className="flex items-center max-w-1/2 text-white">
-                  <div className="px-4 py-2 bg-indigo-400 rounded-xl">
+                  <div className="px-4 py-2 bg-indigo-500 rounded-xl">
                     {msg.user}
                   </div>
                   <div className="bg-neutral-700 rounded-full p-4 ml-4">
@@ -193,7 +193,7 @@ const Chat = () => {
             </button>
             <button
               type="submit"
-              className="p-4 text-white rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer"
+              className="p-4 text-indigo-500 rounded-full hover:bg-neutral-800 transition-all duration-150 curson-pointer"
               disabled={loading}
             >
               <IoSend size={24} />

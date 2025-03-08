@@ -18,7 +18,7 @@ const Cursor = () => {
 
     const targetedEffect = () => {
       const targetedEffectElements = document.querySelectorAll(
-        'title-text, [data-cursor-effects="true"]'
+        '[data-cursor-effects="true"]'
       );
 
       targetedEffectElements.forEach((element) => {
@@ -29,9 +29,7 @@ const Cursor = () => {
             ease: "power4.out",
           });
 
-          if (element.hasAttribute("data-cursor-blend")) {
-            setIsBlendMode(true);
-          }
+          element.hasAttribute("data-cursor-blend") && setIsBlendMode(true);
         });
 
         element.addEventListener("mouseleave", () => {

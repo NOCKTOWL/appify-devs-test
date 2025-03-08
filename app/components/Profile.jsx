@@ -34,7 +34,10 @@ const Profile = () => {
             {/* <li className="hover:bg-neutral-700 p-2 rounded-lg transition-all duration-150">
           Profile
         </li> */}
-            <li className="flex items-center justify-between gap-4 hover:bg-neutral-700 p-2 rounded-lg transition-all duration-150">
+            <li
+              className="flex items-center justify-between gap-4 hover:bg-neutral-700 p-2 rounded-lg transition-all duration-150"
+              title="Dummy Settings Button"
+            >
               <IoSettingsOutline size={24} />
               Settings
             </li>
